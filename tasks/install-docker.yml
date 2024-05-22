@@ -1,9 +1,9 @@
 ---
 - name: Become block
   block:
-    - name: Install {{ docker_package }}
+    - name: Install {{ docker_packages }}
       package:
-        name: '{{ docker_package }}'
+        name: '{{ docker_packages }}'
         state: present
       register: installed_docker
       retries: 30

@@ -23,6 +23,9 @@ Requirements
      - 7
    - Ubuntu
      - 18.04
+     - 20.04
+     - 22.04
+     - 24.04
    - Debian
      - stretch
    - Amazon Linux 2
