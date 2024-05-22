@@ -12,11 +12,13 @@
     - name: Add Docker GPG key
       apt_key:
         url: '{{ docker_gpg }}'
+        keyring: /etc/apt/trusted.gpg.d/docker.gpg
       register: installed_package
       until: installed_package is succeeded
 
     - name: Add Docker repository
       apt_repository:
         repo: '{{ docker_repo }}'
+        state: present
         validate_certs: true
   become: true
