@@ -30,6 +30,36 @@
         src: daemon.json.j2
         dest: /etc/docker/daemon.json
       notify: restart docker
+
+    - name: Create docker-compose symlink
+      file:
+        src: /usr/libexec/docker/cli-plugins/docker-compose
+        dest: /usr/bin/docker-compose
+        owner: root
+        group: root
+        state: link
+
+    - name: Create docker config folders
+      file:
+        path: "{{ item.home }}/.docker"
+        state: directory
+        mode: 0755
+        owner: "{{ item.owner }}"
+        group: "{{ item.owner }}"
+      loop:
+        - { home: "/root", owner: "root" }
+        - { home: "/home/vagrant", owner: "vagrant" }
+
+    - name: Send docker config login
+      template:
+        src: config.json.j2
+        dest: "{{ item.home }}/.docker/config.json"
+        mode: "0640"
+        owner: "{{ item.owner }}"
+        group: "{{ item.owner }}"
+      loop:
+        - { home: "/root", owner: "root" }
+        - { home: "/home/vagrant", owner: "vagrant" }
   become: true
 
 - name: force all notified handlers to run
