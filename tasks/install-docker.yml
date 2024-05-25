@@ -50,16 +50,26 @@
         - { home: "/root", owner: "root" }
         - { home: "/home/vagrant", owner: "vagrant" }
 
+    - name: Install amazon-ecr-credential-helper
+      package:
+        name: amazon-ecr-credential-helper
+        state: present
+      register: amazon_ecr_credential_helper
+      retries: 30
+      until: amazon_ecr_credential_helper is succeeded
+      when: aws_private_ecr_registry_name is defined
+
     - name: Send docker config login
       template:
         src: config.json.j2
         dest: "{{ item.home }}/.docker/config.json"
-        mode: "0640"
+        mode: 0755
         owner: "{{ item.owner }}"
         group: "{{ item.owner }}"
       loop:
         - { home: "/root", owner: "root" }
         - { home: "/home/vagrant", owner: "vagrant" }
+      when: aws_private_ecr_registry_name is defined
   become: true
 
 - name: force all notified handlers to run

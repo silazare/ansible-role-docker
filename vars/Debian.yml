@@ -19,7 +19,6 @@ docker_packages:
   - containerd.io
   - docker-buildx-plugin
   - docker-compose-plugin
-  - amazon-ecr-credential-helper
 
 docker_repo_default: >-
       deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution | lower }}
