@@ -39,7 +39,7 @@
         group: root
         state: link
 
-    - name: Create docker config folders
+    - name: Create docker config folders for root
       file:
         path: "{{ item.home }}/.docker"
         state: directory
@@ -48,7 +48,18 @@
         group: "{{ item.owner }}"
       loop:
         - { home: "/root", owner: "root" }
-        - { home: "/home/vagrant", owner: "vagrant" }
+
+    - name: Create docker config folders for additional users
+      file:
+        path: "{{ item.home }}/.docker"
+        state: directory
+        mode: 0755
+        owner: "{{ item.owner }}"
+        group: "{{ item.owner }}"
+      loop: "{{ additional_users }}"
+      when:
+        - additional_users is defined
+        - additional_users | length > 0
 
     - name: Install amazon-ecr-credential-helper
       package:
@@ -59,7 +70,7 @@
       until: amazon_ecr_credential_helper is succeeded
       when: aws_private_ecr_registry_name is defined
 
-    - name: Send docker config login
+    - name: Send docker config login for root
       template:
         src: config.json.j2
         dest: "{{ item.home }}/.docker/config.json"
@@ -68,8 +79,21 @@
         group: "{{ item.owner }}"
       loop:
         - { home: "/root", owner: "root" }
-        - { home: "/home/vagrant", owner: "vagrant" }
       when: aws_private_ecr_registry_name is defined
+
+    - name: Send docker config login for additional users
+      template:
+        src: config.json.j2
+        dest: "{{ item.home }}/.docker/config.json"
+        mode: 0755
+        owner: "{{ item.owner }}"
+        group: "{{ item.owner }}"
+      loop: "{{ additional_users }}"
+      when:
+        - additional_users is defined
+        - additional_users | length > 0
+        - aws_private_ecr_registry_name is defined
+
   become: true
 
 - name: force all notified handlers to run
